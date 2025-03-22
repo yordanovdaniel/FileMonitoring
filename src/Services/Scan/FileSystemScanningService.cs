@@ -2,7 +2,7 @@
 {
     internal class FileSystemScanningService : IFileScanningService
     {
-        public IEnumerable<FileInfo> Scan()
+        public IEnumerable<string> Scan()
         {
             throw new NotImplementedException();
         }
