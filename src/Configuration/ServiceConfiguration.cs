@@ -1,4 +1,6 @@
 ﻿using FileMonitoringApp.Services.Monitoring;
+using FileMonitoringApp.Services.Scan;
+using FileMonitoringApp.Services.Upload;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +11,8 @@ namespace FileMonitoringApp.Configuration
         public static IServiceCollection Configure(this IServiceCollection services)
         {
             return services
-                .AddConfiguration();
+                .AddConfiguration()
+                .AddServices();
         }
 
         private static IServiceCollection AddConfiguration(this IServiceCollection services)
@@ -21,5 +24,14 @@ namespace FileMonitoringApp.Configuration
              );
         }
 
+        private static IServiceCollection AddServices(this IServiceCollection services)
+        {
+            services.AddSingleton<IFileMonitoringService, FileMonitoringService>();
+            
+            services.AddSingleton<IFileScanningService, FileSystemScanningService>();
+            services.AddSingleton<IFileUploadingService, MOVEitFileUploadingService>();
+
+            return services;
+        }
     }
 }

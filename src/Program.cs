@@ -10,6 +10,9 @@ namespace FileMonitoringApp
         {
             var serviceProvider = CreateConfiguredServiceProvider();
 
+            var fileMonitoringService = serviceProvider.GetRequiredService<IFileMonitoringService>();
+
+            fileMonitoringService.Monitor();
         }
 
         private static IServiceProvider CreateConfiguredServiceProvider()
