@@ -10,6 +10,7 @@ using FileMonitoringApp.Settings.FileTransfer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using FileMonitoringApp.Services.RelativePath;
 
 namespace FileMonitoringApp.Configuration
 {
@@ -54,6 +55,7 @@ namespace FileMonitoringApp.Configuration
             services.AddTransient<IFileTransferClient, MOVEitClient>();
             services.AddTransient<ITimeService, TimeService>();
             services.AddTransient<IFileHashService, Sha1FileHashService>();
+            services.AddTransient<IRelativePathService, RelativePathService>();
 
             return services;
         }

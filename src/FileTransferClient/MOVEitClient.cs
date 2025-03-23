@@ -25,7 +25,7 @@ namespace FileMonitoringApp.FileTransferClient
         public async Task<UserDetails> GetCurrentUserDetailsAsync()
         {
             var client = await _fileTransferServiceConnection.GetClientAsync();
-            
+
             var response = await client.GetAsync("users/self");
 
             return await response.MapToAsync<UserDetails>();
@@ -49,34 +49,54 @@ namespace FileMonitoringApp.FileTransferClient
             return await response.MapToAsync<FolderFiles>();
         }
 
-        public async Task<string> UploadAsync(string filePath, FileHashInfo fileHash, int folderId)
+        public async Task<string?> UploadAsync(string filePath, FileHashInfo fileHash, int folderId)
         {
-            var client = await _fileTransferServiceConnection.GetClientAsync();
+            try
+            {
+                var client = await _fileTransferServiceConnection.GetClientAsync();
 
-            using var form = new MultipartFormDataContent();
+                using var form = new MultipartFormDataContent();
 
-            form.AddFile(filePath, "file");
-            form.Add(new StringContent("hashtype"), fileHash.HashType);
-            form.Add(new StringContent("hash"), fileHash.HashValue);
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                var fileContent = new StreamContent(fileStream);
+                form.Add(fileContent, "file", Path.GetFileName(filePath));
+                
+                form.Add(new StringContent("hashtype"), fileHash.HashType);
+                form.Add(new StringContent("hash"), fileHash.HashValue);
 
-            var response = await client.PostAsync($"folders/{folderId}/files", form);
+                var response = await client.PostAsync($"folders/{folderId}/files", form);
 
-            var fileUploadResponse = await response.MapToAsync<FileUploadResponse>();
+                var fileUploadResponse = await response.MapToAsync<FileUploadResponse>();
 
-            _logger.LogInformation($"Uploaded file with id: {fileUploadResponse.FileId}");
+                _logger.LogInformation($"Uploaded file with id: {fileUploadResponse.FileId}");
 
-            return fileUploadResponse.FileId;
+                return fileUploadResponse.FileId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to upload file with path {filePath}. Exception details: {ex}");
+                return null;
+            }
         }
 
         public async Task<bool> DeleteAsync(string fileId)
         {
-            var client = await _fileTransferServiceConnection.GetClientAsync();
+            try
+            {
+                var client = await _fileTransferServiceConnection.GetClientAsync();
 
-            var response = await client.DeleteAsync($"files/{fileId}");
+                var response = await client.DeleteAsync($"files/{fileId}");
+                response.EnsureSuccessStatusCode();
 
-            _logger.LogInformation($"Deleted file with id: {fileId}");
+                _logger.LogInformation($"Deleted file with id: {fileId}");
 
-            return response.IsSuccessStatusCode;
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to delete file with id {fileId}. Exception details: {ex}");
+                return false;
+            }
         }
     }
 }

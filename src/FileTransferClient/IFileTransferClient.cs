@@ -10,7 +10,7 @@ namespace FileMonitoringApp.FileTransferClient
 
         Task<FolderFiles> GetFolderFilesAsync(int folderId, int page);
 
-        Task<string> UploadAsync(string filePath, FileHashInfo fileHash, int folderId);
+        Task<string?> UploadAsync(string filePath, FileHashInfo fileHash, int folderId);
 
         Task<bool> DeleteAsync(string fileId);
     }

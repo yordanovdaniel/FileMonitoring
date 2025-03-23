@@ -32,12 +32,12 @@ namespace FileMonitoringApp.Services.Monitor
 
             if (!_uploadedFiles.ContainsKey(filePath))
             {
-                fileForDelete = _uploadedFiles[filePath];
                 return false;
             }
 
             if (_uploadedFiles[filePath].Hash != fileHash)
             {
+                fileForDelete = _uploadedFiles[filePath];
                 return false;
             }
 
