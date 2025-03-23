@@ -2,7 +2,7 @@
 
 namespace FileMonitoringApp.Models
 {
-    internal class MOVEitFileUploadResponse
+    internal class FileUploadResponse
     {
         [JsonRequired]
         [JsonProperty("id")]

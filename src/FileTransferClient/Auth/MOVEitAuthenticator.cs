@@ -112,12 +112,12 @@ namespace FileMonitoringApp.FileTransferClient.Auth
         {
             var response = await httpClient.PostAsync("token", content);
 
-            var tokenData = await response.MapToAsync<MOVEitTokenResponse>();
+            var tokenData = await response.MapToAsync<TokenResponse>();
 
             UpdateTokenInfo(httpClient, tokenData);
         }
 
-        private void UpdateTokenInfo(HttpClient httpClient, MOVEitTokenResponse tokenData)
+        private void UpdateTokenInfo(HttpClient httpClient, TokenResponse tokenData)
         {
             _refreshToken = tokenData.RefreshToken;
             _expirationTime = _timeService.ProvideCurrentUtcTime().AddSeconds(tokenData.ExpiresInSeconds);

@@ -2,7 +2,7 @@
 
 namespace FileMonitoringApp.Models
 {
-    internal class MOVEitUserDetailsResponse
+    internal class UserDetails
     {
         [JsonRequired]
         [JsonProperty("homeFolderID")]

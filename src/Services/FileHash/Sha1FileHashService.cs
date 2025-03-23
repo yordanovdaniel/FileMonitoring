@@ -2,17 +2,17 @@
 
 namespace FileMonitoringApp.Services.FileHash
 {
-    internal class Sha256FileHashService : IFileHashService
+    internal class Sha1FileHashService : IFileHashService
     {
-        public string HashType => "sha-256";
+        public string HashType => "sha-1";
 
         public async Task<string> ComputeFileHashAsync(string filePath)
         {
-            using (var sha256 = SHA256.Create())
+            using (var sha1 = SHA1.Create())
             {
                 using (var fileStream = File.OpenRead(filePath))
                 {
-                    byte[] hashBytes = await sha256.ComputeHashAsync(fileStream);
+                    byte[] hashBytes = await sha1.ComputeHashAsync(fileStream);
 
                     return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
                 }

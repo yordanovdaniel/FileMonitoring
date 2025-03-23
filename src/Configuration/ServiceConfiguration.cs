@@ -53,7 +53,7 @@ namespace FileMonitoringApp.Configuration
             services.AddTransient<IFileScanningService, FileSystemScanningService>();
             services.AddTransient<IFileTransferClient, MOVEitClient>();
             services.AddTransient<ITimeService, TimeService>();
-            services.AddTransient<IFileHashService, Sha256FileHashService>();
+            services.AddTransient<IFileHashService, Sha1FileHashService>();
 
             return services;
         }

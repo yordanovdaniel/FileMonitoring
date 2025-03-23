@@ -2,7 +2,7 @@
 
 namespace FileMonitoringApp.Models
 {
-    internal class MOVEitTokenResponse
+    internal class TokenResponse
     {
         [JsonRequired]
         [JsonProperty("access_token")]
