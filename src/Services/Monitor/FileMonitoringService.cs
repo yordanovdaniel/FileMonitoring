@@ -16,9 +16,7 @@ namespace FileMonitoringApp.Services.Monitoring
         private readonly ILogger<FileMonitoringService> _logger;
         private readonly MonitorSettings _monitorSettings;
         // key -> file path, value -> (file hash, file id)
-        private readonly IDictionary<string, (string hash, string id)> _uploadedFiles;
-
-        private readonly object _lock = new object();
+        private readonly IDictionary<string, UploadedFileInfo> _uploadedFiles;
 
         public FileMonitoringService(IFileScanningService fileScanningService,
             IFileTransferClient fileTransferClient,
@@ -32,14 +30,12 @@ namespace FileMonitoringApp.Services.Monitoring
             _logger = logger;
             _monitorSettings = settingsOption.Value;
 
-            _uploadedFiles = new Dictionary<string, (string, string)>();
+            _uploadedFiles = new Dictionary<string, UploadedFileInfo>();
         }
 
         public async Task MonitorAsync()
         {
             var homeFolderId = await GetCurrentUserHomeFolderIdAsync();
-
-            //TODO: load in _uploadedFiles already uploaded files
 
             while (true)
             {
@@ -63,25 +59,54 @@ namespace FileMonitoringApp.Services.Monitoring
                 var fileHash = await _fileHashService.ComputeFileHashAsync(filePath);
                 var relativeFilePath = Path.GetRelativePath(_monitorSettings.FolderPath, filePath);
 
-                if (!CheckIfFileIsUploaded(relativeFilePath, fileHash))
+                if (!CheckIfFileIsUploaded(relativeFilePath, fileHash, out var fileForDelete))
                 {
+                    if (fileForDelete != null && !await HandleDeleteAsync(relativeFilePath, fileForDelete))
+                    {
+                        return;
+                    }
+
                     await HandleUploadAsync(filePath, relativeFilePath, fileHash, folderId);
                 }
             });
         }
 
-        private bool CheckIfFileIsUploaded(string filePath, string fileHash)
+        private bool CheckIfFileIsUploaded(string filePath, string fileHash, out UploadedFileInfo? fileForDelete)
         {
-            lock (_lock)
+            fileForDelete = null;
+
+            if (!_uploadedFiles.ContainsKey(filePath) || _uploadedFiles[filePath].Hash != fileHash)
             {
-                if (!_uploadedFiles.ContainsKey(filePath) || _uploadedFiles[filePath].hash != fileHash)
+                if (_uploadedFiles.ContainsKey(filePath))
                 {
-                    _uploadedFiles[filePath] = (fileHash, string.Empty);
-                    return false;
+                    fileForDelete = _uploadedFiles[filePath];
                 }
+
+                _uploadedFiles[filePath] = new UploadedFileInfo(fileHash, string.Empty);
+                return false;
             }
 
             return true;
+        }
+
+        private async Task<bool> HandleDeleteAsync(string relativeFilePath, UploadedFileInfo uploadedFile)
+        {
+            var isDeleted = false;
+            try
+            {
+                isDeleted = await _fileTransferClient.DeleteAsync(uploadedFile.Id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to delete file with id {uploadedFile.Id}. Exception details: {ex}");
+            }
+
+            if (!isDeleted)
+            {
+                _uploadedFiles[relativeFilePath] = uploadedFile;
+            }
+
+            return isDeleted;
         }
 
         private async Task HandleUploadAsync(string filePath, string relativeFilePath, string fileHash, int folderId)
@@ -97,16 +122,13 @@ namespace FileMonitoringApp.Services.Monitoring
                 _logger.LogError($"Failed to upload file with path {filePath}. Exception details: {ex}");
             }
 
-            lock (_lock)
+            if (string.IsNullOrEmpty(fileId))
             {
-                if (string.IsNullOrEmpty(fileId))
-                {
-                    _uploadedFiles.Remove(relativeFilePath);
-                    return;
-                }
-
-                _uploadedFiles[relativeFilePath] = (fileHash, fileId);
+                _uploadedFiles.Remove(relativeFilePath);
+                return;
             }
+
+            _uploadedFiles[relativeFilePath] = new UploadedFileInfo(fileHash, fileId);
         }
     }
 }

@@ -43,5 +43,14 @@ namespace FileMonitoringApp.FileTransferClient
 
             return fileUploadResponse.FileId;
         }
+
+        public async Task<bool> DeleteAsync(string fileId)
+        {
+            var client = await _fileTransferServiceConnection.GetClientAsync();
+
+            var response = await client.DeleteAsync($"files/{fileId}");
+
+            return response.IsSuccessStatusCode;
+        }
     }
 }
