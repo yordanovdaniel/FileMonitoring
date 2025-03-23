@@ -3,7 +3,7 @@
 This application **monitors a local folder** and automatically **uploads new files** to **MOVEit Transfer** via its **REST API**.
 
 ## **Features**  
-✅ Monitors a specified folder for new files  
+✅ Monitors a specified folder for new & deleted files
 ✅ Securely uploads files to MOVEit Transfer  
 ✅ Configurable via `appsettings.json`  
 
