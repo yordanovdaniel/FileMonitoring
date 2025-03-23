@@ -16,6 +16,7 @@ namespace FileMonitoringApp.Services.Monitoring
         private readonly IFileTransferClient _fileTransferClient;
         private readonly IFileHashService _fileHashService;
         private readonly IRelativePathService _relativePathService;
+        private readonly ILogger<FileMonitoringService> _logger;
         private readonly MonitorSettings _monitorSettings;
 
         private readonly UploadedFilesRegistry _uploadedFilesRegistry;
@@ -24,12 +25,14 @@ namespace FileMonitoringApp.Services.Monitoring
             IFileTransferClient fileTransferClient,
             IFileHashService fileHashService,
             IRelativePathService relativePathService,
+            ILogger<FileMonitoringService> logger,
             IOptions<MonitorSettings> settingsOption)
         {
             _fileScanningService = fileScanningService;
             _fileTransferClient = fileTransferClient;
             _fileHashService = fileHashService;
             _relativePathService = relativePathService;
+            _logger = logger;
             _monitorSettings = settingsOption.Value;
 
             _uploadedFilesRegistry = new UploadedFilesRegistry();
@@ -93,17 +96,24 @@ namespace FileMonitoringApp.Services.Monitoring
         {
             return Parallel.ForEachAsync(filePaths, async (filePath, _) =>
             {
-                var fileHash = await _fileHashService.ComputeFileHashAsync(filePath);
-                var relativeFilePath = _relativePathService.GetRelativePathOfLocalPath(_monitorSettings.FolderPath, filePath);
-
-                if (!_uploadedFilesRegistry.CheckIfFileIsUploaded(relativeFilePath, fileHash, out var fileForDelete))
+                try
                 {
-                    if (fileForDelete != null && !await HandleDeleteAsync(relativeFilePath, fileForDelete))
-                    {
-                        return;
-                    }
+                    var fileHash = await _fileHashService.ComputeFileHashAsync(filePath);
+                    var relativeFilePath = _relativePathService.GetRelativePathOfLocalPath(_monitorSettings.FolderPath, filePath);
 
-                    await HandleUploadAsync(filePath, relativeFilePath, fileHash, folderId);
+                    if (!_uploadedFilesRegistry.CheckIfFileIsUploaded(relativeFilePath, fileHash, out var fileForDelete))
+                    {
+                        if (fileForDelete != null && !await HandleDeleteAsync(relativeFilePath, fileForDelete))
+                        {
+                            return;
+                        }
+
+                        await HandleUploadAsync(filePath, relativeFilePath, fileHash, folderId);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
                 }
             });
         }
