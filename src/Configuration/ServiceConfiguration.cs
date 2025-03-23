@@ -3,6 +3,7 @@ using FileMonitoringApp.Services.Scan;
 using FileMonitoringApp.Services.Upload;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace FileMonitoringApp.Configuration
 {
@@ -12,6 +13,7 @@ namespace FileMonitoringApp.Configuration
         {
             return services
                 .AddConfiguration()
+                .AddLogging(builder => builder.AddConsole())
                 .AddServices();
         }
 

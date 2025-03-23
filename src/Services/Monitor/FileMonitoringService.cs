@@ -1,5 +1,6 @@
 ﻿using FileMonitoringApp.Services.Scan;
 using FileMonitoringApp.Services.Upload;
+using Microsoft.Extensions.Logging;
 
 namespace FileMonitoringApp.Services.Monitoring
 {
@@ -7,15 +8,19 @@ namespace FileMonitoringApp.Services.Monitoring
     {
         private readonly IFileScanningService _fileScanningService;
         private readonly IFileUploadingService _fileUploadingService;
+        private readonly ILogger<FileMonitoringService> _logger;
         private readonly ISet<string> _uploadedFiles;
+
         private readonly object _lock = new object();
 
         public FileMonitoringService(IFileScanningService fileScanningService,
-            IFileUploadingService fileUploadingService
-            /*TODO: ILog*/)
+            IFileUploadingService fileUploadingService,
+            ILogger<FileMonitoringService> logger)
         {
             _fileScanningService = fileScanningService;
             _fileUploadingService = fileUploadingService;
+            _logger = logger;
+
             _uploadedFiles = new HashSet<string>();
         }
 
@@ -25,19 +30,19 @@ namespace FileMonitoringApp.Services.Monitoring
             {
                 var files = _fileScanningService.Scan();
 
-                Parallel.ForEachAsync(files, async (file, _) =>
+                Task.Run(() => Parallel.ForEachAsync(files, async (file, _) =>
                 {
-                    bool fileIsUploaded;
+                    bool fileUploaded;
                     lock (_lock)
                     {
-                        fileIsUploaded = !_uploadedFiles.Add(file);
+                        fileUploaded = !_uploadedFiles.Add(file);
                     }
 
-                    if (fileIsUploaded)
+                    if (fileUploaded)
                     {
                         await HandleUploadAsync(file);
                     }
-                });
+                }));
             }
         }
 
@@ -51,10 +56,10 @@ namespace FileMonitoringApp.Services.Monitoring
             catch (Exception ex)
             {
                 isUploaded = false;
-                //TODO: log ex
+                _logger.LogError($"File: {fileLocation} couldn't upload, exception: {ex}");
             }
 
-            if(!isUploaded)
+            if (!isUploaded)
             {
                 lock (_lock)
                 {
