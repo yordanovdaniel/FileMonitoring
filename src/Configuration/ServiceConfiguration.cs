@@ -1,6 +1,10 @@
-﻿using FileMonitoringApp.Services.Monitoring;
+﻿using FileMonitoringApp.FileTransferClient;
+using FileMonitoringApp.FileTransferClient.Auth;
+using FileMonitoringApp.FileTransferClient.Connection;
+using FileMonitoringApp.Models.FileTransfer;
+using FileMonitoringApp.Services.Monitoring;
 using FileMonitoringApp.Services.Scan;
-using FileMonitoringApp.Services.Upload;
+using FileMonitoringApp.Services.Time;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -19,19 +23,33 @@ namespace FileMonitoringApp.Configuration
 
         private static IServiceCollection AddConfiguration(this IServiceCollection services)
         {
-            return services.AddSingleton<IConfiguration>(provider =>
-                 new ConfigurationBuilder()
+            var configuration = CreateConfiguration();
+            services.AddSingleton(configuration);
+
+            services.Configure<FileTransferSettings>(configuration.GetSection("FileTransfer"));
+            services.Configure<FileTransferAuthSettings>(configuration.GetSection("FileTransfer:Auth"));
+
+            return services;
+        }
+
+        private static IConfiguration CreateConfiguration()
+        {
+            return new ConfigurationBuilder()
                      .AddJsonFile("appsettings.json")
-                     .Build()
-             );
+                     .Build();
         }
 
         private static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddSingleton<IFileMonitoringService, FileMonitoringService>();
-            
-            services.AddSingleton<IFileScanningService, FileSystemScanningService>();
-            services.AddSingleton<IFileUploadingService, MOVEitFileUploadingService>();
+            services.AddTransient<IFileMonitoringService, FileMonitoringService>();
+
+            services.AddTransient<IFileTransferClient, MOVEitClient>();
+            services.AddTransient<IFileTransferAuthenticator, MOVEitAuthenticator>();
+            services.AddTransient<IFileTransferServiceConnection, MOVEitServiceConnection>();
+
+            services.AddTransient<IFileScanningService, FileSystemScanningService>();
+            services.AddTransient<IFileTransferClient, MOVEitClient>();
+            services.AddTransient<ITimeService, TimeService>();
 
             return services;
         }

@@ -1,5 +1,5 @@
-﻿using FileMonitoringApp.Services.Scan;
-using FileMonitoringApp.Services.Upload;
+﻿using FileMonitoringApp.FileTransferClient;
+using FileMonitoringApp.Services.Scan;
 using Microsoft.Extensions.Logging;
 
 namespace FileMonitoringApp.Services.Monitoring
@@ -7,14 +7,14 @@ namespace FileMonitoringApp.Services.Monitoring
     internal class FileMonitoringService : IFileMonitoringService
     {
         private readonly IFileScanningService _fileScanningService;
-        private readonly IFileUploadingService _fileUploadingService;
+        private readonly IFileTransferClient _fileUploadingService;
         private readonly ILogger<FileMonitoringService> _logger;
         private readonly ISet<string> _uploadedFiles;
 
         private readonly object _lock = new object();
 
         public FileMonitoringService(IFileScanningService fileScanningService,
-            IFileUploadingService fileUploadingService,
+            IFileTransferClient fileUploadingService,
             ILogger<FileMonitoringService> logger)
         {
             _fileScanningService = fileScanningService;

@@ -2,6 +2,6 @@
 {
     internal interface IFileScanningService
     {
-        public IEnumerable<string> Scan();
+        IEnumerable<string> Scan();
     }
 }

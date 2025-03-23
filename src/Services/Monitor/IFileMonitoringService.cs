@@ -2,6 +2,6 @@
 {
     internal interface IFileMonitoringService
     {
-        public void Monitor();
+        void Monitor();
     }
 }
