@@ -57,8 +57,7 @@ namespace FileMonitoringApp.FileTransferClient
 
                 using var form = new MultipartFormDataContent();
 
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-                var fileContent = new StreamContent(fileStream);
+                using var fileContent = new StreamContent(File.OpenRead(filePath));
                 form.Add(fileContent, "file", Path.GetFileName(filePath));
                 
                 form.Add(new StringContent("hashtype"), fileHash.HashType);

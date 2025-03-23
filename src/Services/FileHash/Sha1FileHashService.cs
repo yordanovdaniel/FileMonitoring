@@ -8,15 +8,12 @@ namespace FileMonitoringApp.Services.FileHash
 
         public async Task<string> ComputeFileHashAsync(string filePath)
         {
-            using (var sha1 = SHA1.Create())
-            {
-                using (var fileStream = File.OpenRead(filePath))
-                {
-                    byte[] hashBytes = await sha1.ComputeHashAsync(fileStream);
+            using var sha1 = SHA1.Create();
+            using var fileStream = File.OpenRead(filePath);
 
-                    return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
-                }
-            }
+            byte[] hashBytes = await sha1.ComputeHashAsync(fileStream);
+
+            return BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
         }
     }
 }
