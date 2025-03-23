@@ -2,6 +2,6 @@
 {
     internal interface IFileMonitoringService
     {
-        void Monitor();
+        Task MonitorAsync();
     }
 }

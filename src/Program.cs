@@ -12,7 +12,7 @@ namespace FileMonitoringApp
 
             var fileMonitoringService = serviceProvider.GetRequiredService<IFileMonitoringService>();
 
-            fileMonitoringService.Monitor();
+            fileMonitoringService.MonitorAsync().GetAwaiter().GetResult();
         }
 
         private static IServiceProvider CreateConfiguredServiceProvider()

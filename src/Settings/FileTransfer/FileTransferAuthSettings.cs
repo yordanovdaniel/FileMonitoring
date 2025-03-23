@@ -1,4 +1,4 @@
-﻿namespace FileMonitoringApp.Models.FileTransfer
+﻿namespace FileMonitoringApp.Settings.FileTransfer
 {
     internal class FileTransferAuthSettings
     {

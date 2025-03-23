@@ -1,9 +1,10 @@
 ﻿using FileMonitoringApp.Models;
-using FileMonitoringApp.Models.FileTransfer;
+using FileMonitoringApp.Settings.FileTransfer;
 using FileMonitoringApp.Services.Time;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using FileMonitoringApp.Extensions;
 
 namespace FileMonitoringApp.FileTransferClient.Auth
 {
@@ -111,18 +112,13 @@ namespace FileMonitoringApp.FileTransferClient.Auth
         {
             var response = await httpClient.PostAsync("token", content);
 
-            response.EnsureSuccessStatusCode();
-
-            var responseText = await response.Content.ReadAsStringAsync();
-            var tokenData = JsonConvert.DeserializeObject<MOVEitTokenResponse>(responseText);
+            var tokenData = await response.MapToAsync<MOVEitTokenResponse>();
 
             UpdateTokenInfo(httpClient, tokenData);
         }
 
-        private void UpdateTokenInfo(HttpClient httpClient, MOVEitTokenResponse? tokenData)
+        private void UpdateTokenInfo(HttpClient httpClient, MOVEitTokenResponse tokenData)
         {
-            ArgumentNullException.ThrowIfNull(tokenData, nameof(tokenData));
-
             _refreshToken = tokenData.RefreshToken;
             _expirationTime = _timeService.ProvideCurrentUtcTime().AddSeconds(tokenData.ExpiresInSeconds);
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenData.AccessToken);

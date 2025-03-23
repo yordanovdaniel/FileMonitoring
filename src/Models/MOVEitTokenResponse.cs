@@ -8,6 +8,7 @@ namespace FileMonitoringApp.Models
         [JsonProperty("access_token")]
         public required string AccessToken { get; set; }
 
+        [JsonRequired]
         [JsonProperty("expires_in")]
         public int ExpiresInSeconds { get; set; }
 

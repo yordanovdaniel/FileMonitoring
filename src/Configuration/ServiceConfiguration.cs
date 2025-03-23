@@ -1,10 +1,12 @@
 ﻿using FileMonitoringApp.FileTransferClient;
 using FileMonitoringApp.FileTransferClient.Auth;
 using FileMonitoringApp.FileTransferClient.Connection;
-using FileMonitoringApp.Models.FileTransfer;
+using FileMonitoringApp.Services.FileHash;
 using FileMonitoringApp.Services.Monitoring;
 using FileMonitoringApp.Services.Scan;
 using FileMonitoringApp.Services.Time;
+using FileMonitoringApp.Settings.Monitor;
+using FileMonitoringApp.Settings.FileTransfer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -26,6 +28,7 @@ namespace FileMonitoringApp.Configuration
             var configuration = CreateConfiguration();
             services.AddSingleton(configuration);
 
+            services.Configure<MonitorSettings>(configuration.GetSection("Monitor"));
             services.Configure<FileTransferSettings>(configuration.GetSection("FileTransfer"));
             services.Configure<FileTransferAuthSettings>(configuration.GetSection("FileTransfer:Auth"));
 
@@ -50,6 +53,7 @@ namespace FileMonitoringApp.Configuration
             services.AddTransient<IFileScanningService, FileSystemScanningService>();
             services.AddTransient<IFileTransferClient, MOVEitClient>();
             services.AddTransient<ITimeService, TimeService>();
+            services.AddTransient<IFileHashService, Sha256FileHashService>();
 
             return services;
         }

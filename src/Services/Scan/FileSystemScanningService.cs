@@ -2,9 +2,9 @@
 {
     internal class FileSystemScanningService : IFileScanningService
     {
-        public IEnumerable<string> Scan()
+        public IEnumerable<string> Scan(string folderPath)
         {
-            throw new NotImplementedException();
+            return Directory.GetFiles(folderPath, "*.*", SearchOption.AllDirectories);
         }
     }
 }

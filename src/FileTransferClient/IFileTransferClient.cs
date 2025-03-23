@@ -1,7 +1,11 @@
-﻿namespace FileMonitoringApp.FileTransferClient
+﻿using FileMonitoringApp.Models;
+
+namespace FileMonitoringApp.FileTransferClient
 {
     internal interface IFileTransferClient
     {
-        Task<bool> UploadAsync(string location);
+        Task<MOVEitUserDetailsResponse> GetCurrentUserDetailsAsync();
+
+        Task<string> UploadAsync(string filePath, FileHashInfo fileHash, int folderId);
     }
 }
