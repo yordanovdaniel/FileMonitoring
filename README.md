@@ -1,6 +1,6 @@
-# **File Monitoring & Upload Application**  
+# **File Monitoring Application**  
 
-This application **monitors a local folder** and automatically **uploads new files** to **MOVEit Transfer** via its **REST API**.
+This application **monitors a local folder** and automatically **uploads & deletes files** to **MOVEit Transfer** via its **REST API**.
 
 ## **Features**  
 ✅ Monitors a specified folder for new & deleted files  
