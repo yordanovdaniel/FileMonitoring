@@ -18,7 +18,6 @@ namespace FileMonitoringApp.Services.Monitoring
         private readonly IRelativePathService _relativePathService;
         private readonly ILogger<FileMonitoringService> _logger;
         private readonly MonitorSettings _monitorSettings;
-        // key -> file path, value -> (file hash, file id)
 
         private readonly UploadedFilesRegistry _uploadedFilesRegistry;
 

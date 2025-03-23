@@ -4,6 +4,7 @@ namespace FileMonitoringApp.Services.Monitor
 {
     internal class UploadedFilesRegistry
     {
+        // key -> file path, value -> UploadedFileInfo
         private readonly IDictionary<string, UploadedFileInfo> _uploadedFiles;
 
         public UploadedFilesRegistry()
