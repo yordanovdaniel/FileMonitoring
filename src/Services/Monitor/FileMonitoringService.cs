@@ -16,7 +16,6 @@ namespace FileMonitoringApp.Services.Monitoring
         private readonly IFileTransferClient _fileTransferClient;
         private readonly IFileHashService _fileHashService;
         private readonly IRelativePathService _relativePathService;
-        private readonly ILogger<FileMonitoringService> _logger;
         private readonly MonitorSettings _monitorSettings;
 
         private readonly UploadedFilesRegistry _uploadedFilesRegistry;
@@ -25,13 +24,11 @@ namespace FileMonitoringApp.Services.Monitoring
             IFileTransferClient fileTransferClient,
             IFileHashService fileHashService,
             IRelativePathService relativePathService,
-            ILogger<FileMonitoringService> logger,
             IOptions<MonitorSettings> settingsOption)
         {
             _fileScanningService = fileScanningService;
             _fileTransferClient = fileTransferClient;
             _fileHashService = fileHashService;
-            _logger = logger;
             _relativePathService = relativePathService;
             _monitorSettings = settingsOption.Value;
 
