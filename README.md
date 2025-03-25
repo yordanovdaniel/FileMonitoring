@@ -42,7 +42,7 @@ Once configured, start the application to begin monitoring and uploading files.
     "FolderPath": "C:\\Path\\To\\Monitor",
     "DelayBetweenScansInSeconds": "1"
   }
-}
+}```
 
 ## What's Next
 
