@@ -50,7 +50,7 @@ Once configured, start the application to begin monitoring and uploading files.
 While the application is fully functional, there are areas targeted for improvement:
 
 - **Unit Testing:** Adding tests to cover core functionalities.
-- **Retry Mechanisms:** Introducing a policy to gracefully handle errors like locked files.
+- **Retry Mechanisms:** Introducing a policy to gracefully handle transient http faults.
 - **Security Enhancements:** Improving password handling and storage.
 
 These improvements were deprioritized due to time constraints and are slated for future development.
