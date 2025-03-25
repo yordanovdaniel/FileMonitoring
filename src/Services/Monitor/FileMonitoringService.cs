@@ -40,6 +40,7 @@ namespace FileMonitoringApp.Services.Monitoring
 
         public async Task MonitorAsync()
         {
+            var delayBetweenScans = GetDelayBetweenScans();
             var homeFolderId = await GetCurrentUserHomeFolderIdAsync();
 
             await SeedUploadedFilesAsync(homeFolderId);
@@ -50,7 +51,19 @@ namespace FileMonitoringApp.Services.Monitoring
 
                 await UploadFilesAsync(filePaths, homeFolderId);
                 await DeleteFilesAsync(filePaths);
+
+                await Task.Delay(delayBetweenScans);
             }
+        }
+
+        private TimeSpan GetDelayBetweenScans()
+        {
+            if (_monitorSettings.DelayBetweenScansInSeconds < 0)
+            {
+                throw new ArgumentOutOfRangeException($"{nameof(_monitorSettings.DelayBetweenScansInSeconds)} can\'t be negative!");
+            }
+
+            return TimeSpan.FromSeconds(_monitorSettings.DelayBetweenScansInSeconds);
         }
 
         private async Task<int> GetCurrentUserHomeFolderIdAsync()
