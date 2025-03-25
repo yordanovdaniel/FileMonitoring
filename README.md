@@ -26,7 +26,7 @@ Once configured, start the application to begin monitoring and uploading files.
 ---
 
 ## **Example Configuration (`appsettings.json`)**  
-```json
+```
 {
   "FileTransfer": {
     "BaseUrl": "https://moveitcloud.com/api/v1",
@@ -42,7 +42,8 @@ Once configured, start the application to begin monitoring and uploading files.
     "FolderPath": "C:\\Path\\To\\Monitor",
     "DelayBetweenScansInSeconds": "1"
   }
-}```
+}
+```
 
 ## What's Next
 
